@@ -9,7 +9,7 @@ prerequisites:
 
 .PHONY: run
 run:
-	@echo "Running Main in Spin CLI..."
+	@echo "Verifying Main in Spin CLI..."
 	@spin -a main.pml && gcc -w -o pan pan.c && ./pan
 
 .PHONY: run-gui
@@ -19,6 +19,6 @@ run-gui:
 
 .PHONY: run-helloworld
 run-helloworld:
-	@echo "Running Hello World in CLI..."
+	@echo "Simulating Hello World in CLI..."
 	@spin -V
 	@spin helloworld.pml

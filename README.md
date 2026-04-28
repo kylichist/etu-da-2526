@@ -19,7 +19,7 @@ make prerequisites
 make run-helloworld
 ```
 
-Если видим в логах что-то вроде
+Если видим в логах что-то вроде такого, то все отлично:
 
 ```text
 Running Hello World in CLI...
@@ -30,13 +30,13 @@ Spin Version 6.5.2 -- 6 December 2019
 
 ## Запуск верификации
 
-CLI:
+CLI-таргет:
 
 ```bash
 make run
 ```
 
-GUI:
+GUI-таргет:
 
 ```bash
 make run-gui
