@@ -10,6 +10,7 @@ prerequisites:
 .PHONY: run
 run:
 	@echo "Verifying Main in Spin CLI..."
+	@spin -T main.pml
 	@spin -a main.pml && gcc -w -o pan pan.c && ./pan
 
 .PHONY: run-gui
@@ -22,3 +23,8 @@ run-helloworld:
 	@echo "Simulating Hello World in CLI..."
 	@spin -V
 	@spin helloworld.pml
+
+.PHONY: test
+test:
+	@echo "Running all tests..."
+	@python3 test.py
