@@ -1,43 +1,6 @@
 # etu-da-2526
 
-## Пререквизиты
+## Структура
 
-1. Установка пакетов: `spin tcl tk graphviz wish`
-2. Установка gui-скрипта: [raw](https://raw.githubusercontent.com/nimble-code/Spin/refs/heads/master/optional_gui/ispin.tcl)
-
-Для Ubuntu можно запустить таргет `prerequisites`:
-
-```bash
-make prerequisites
-```
-
-## Проверка окружения
-
-Запустить таргет `run-helloworld`:
-
-```bash
-make run-helloworld
-```
-
-Если видим в логах что-то вроде такого, то все отлично:
-
-```text
-Running Hello World in CLI...
-Spin Version 6.5.2 -- 6 December 2019
-      Hello, World!
-1 process created
-```
-
-## Запуск верификации
-
-CLI-таргет:
-
-```bash
-make run
-```
-
-GUI-таргет:
-
-```bash
-make run-gui
-```
+- [`part-1`](part-1/): директория с исходным кодом для [ИДЗ #1](part-1/TASK.md): параллельное циклическое (по строкам) перемножение матриц
+- [`part-2`](part-2/): директория с исходным кодом для [ИДЗ #2](part-2/TASK.md): алгорит Барца

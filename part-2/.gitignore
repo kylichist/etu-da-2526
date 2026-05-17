@@ -1,0 +1,7 @@
+ispin
+pan*
+dot*
+*.tmp
+*.trail
+
+docs/
