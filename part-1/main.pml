@@ -3,6 +3,10 @@
 // Количество параллельных процессов
 #define P 2
 
+typedef Row {
+	int elements[N];
+};
+
 // Одномерные массивы для хранения двумерных матриц N*N
 int A[N * N];
 int B[N * N];
@@ -13,7 +17,7 @@ bool done = false;
 
 // Канал для передачи данных от рабочих процессов к нулевому.
 // Передается: { номер строки, номер столбца, вычисленное значение }
-chan row_computed = [N * N] of { byte,byte,int };
+chan row_computed = [N] of { byte, Row };
 
 // Функция рабочего процесса (воркера)
 proctype worker(byte id) {
@@ -21,7 +25,8 @@ proctype worker(byte id) {
 	byte row = id;
 	byte col,k;
 	int sum;
-	
+	Row current;
+
 // Цикл по строкам, закрепленным за данным процессом
 	do
 	:: row < N -> 
@@ -44,12 +49,20 @@ proctype worker(byte id) {
 			:: id == 0 -> 
 				C[row * N + col] = sum;
 // Остальные процессы отправляют результат через канал нулевому процессу
-			:: id != 0 -> 
-				row_computed!row,col,sum;
+			:: id != 0 ->
+				current.elements[col] = sum; 
+				//row_computed!row,col,sum;
 			fi;
 			col = col + 1;
 		:: col == N -> break;
 		od;
+
+		if 
+		:: id != 0 ->
+			row_computed!row,current;
+		:: id == 0 -> skip;
+		fi;
+
 // Переход к следующей строке, закрепленной за этим процессом
 		row = row + P;
 	:: row >= N -> break;
@@ -59,13 +72,13 @@ proctype worker(byte id) {
 	if
 	:: id == 0 -> 
 		int i,j;
-		int expected_elements = 0;
+		int expected_rows = 0;
 		i = 0;
 // Подсчитываем, сколько элементов мы должны получить из канала (сколько элементов вычислили другие процессы)
 		do
 		:: i < N -> 
 			if
-			:: (i % P) != 0 -> expected_elements = expected_elements + N;
+			:: (i % P) != 0 -> expected_rows++;
 			:: else -> skip;
 			fi;
 			i = i + 1;
@@ -73,16 +86,25 @@ proctype worker(byte id) {
 		od;
 		
 		int received = 0;
-		byte r,c;
-		int val;
+		byte r, c;
+		Row receivedRow;
+		c=0;
 // Цикл ожидания и чтения вычисленных элементов из канала
 		do
-		:: received < expected_elements -> 
-			row_computed?r,c,val;
+		:: received < expected_rows -> 
+			row_computed?r,receivedRow;
 // Запись полученного элемента в результирующую матрицу
-			C[r * N + c] = val;
-			received = received + 1;
-		:: received == expected_elements -> break;
+			do
+			:: c < N -> 
+				C[r*N + c] = receivedRow.elements[c];
+				c++;
+			:: c == N -> break;
+			od;
+
+			//C[r * N + c] = val;
+			//c++;
+			received++;
+		:: received == expected_rows -> break;
 		od;
 		
 // Вывод итоговой матрицы C

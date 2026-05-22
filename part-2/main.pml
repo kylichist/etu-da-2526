@@ -14,6 +14,8 @@ int count = K;
 // Счетчик процессов, находящихся в критической секции (только для верификации)
 byte critical = 0;
 
+byte Pi_zones[N];
+
 // Операции над бинарным семафором по типу busy-wait.
 // wait(s):   атомарно ждем s > 0 и уменьшаем s.
 // signal(s): увеличиваем s.
@@ -29,6 +31,7 @@ proctype process(byte id) {
 // Некритическая секция
 		skip;
 		
+		Pi_zones[id] = 1;
 // --- Симуляция операции wait над обобщенным семафором (p1..p6) ---
 		wait(gate);// p1
 		wait(S);// p2
@@ -42,6 +45,7 @@ proctype process(byte id) {
 // --- Критическая секция ---
 // Вход/выход считаем счетчиком critical; алгоритм Барца гарантирует,
 // что одновременно в КС находится не более K процессов.
+		Pi_zones[id] = 2;
 		critical++;
 		assert(critical <= K);
 		critical--;
@@ -54,6 +58,7 @@ proctype process(byte id) {
 		:: else -> skip;
 		fi;
 		signal(S);// p11
+		Pi_zones[id] = 3;
 	od;
 }
 
@@ -63,6 +68,7 @@ init {
 	atomic {
 		do
 		:: proc_id < N -> 
+			Pi_zones[proc_id] = 0;
 			run process(proc_id);
 			proc_id = proc_id + 1;
 		:: proc_id == N -> break;
@@ -84,3 +90,5 @@ ltl binsem { [] (S <= 1) }
 // Свойство живости: критическая секция посещается бесконечно часто
 // (система не попадает в дедлок и продолжает прогресс)
 ltl liveness { [] <> (critical > 0) }
+
+ltl check { [] ((Pi_zones[0] == 1) -> (<> (Pi_zones[0] == 2))) }
